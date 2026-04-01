@@ -134,39 +134,32 @@ def _get_model_output_class_count(model):
 
 def validate_model_label_map_sizes_or_fail(model, model_name, label_map_specs):
     actual_class_count = _get_model_output_class_count(model)
-    mismatches = []
-
-    for label_map_name, label_map in label_map_specs:
+    for mode_name, label_map in label_map_specs:
         expected_class_count = len(label_map)
         if actual_class_count != expected_class_count:
-            mismatches.append(
-                f"{label_map_name}: expected {expected_class_count}, actual {actual_class_count}"
+            raise ValueError(
+                "[Startup validation error] Model/label-map size mismatch detected. "
+                f"Model: {model_name}. "
+                f"Mode: {mode_name}. "
+                f"Expected outputs: {expected_class_count}. "
+                f"Actual outputs (model.output_shape[-1]): {actual_class_count}."
             )
-
-    if mismatches:
-        mismatch_details = "; ".join(mismatches)
-        raise ValueError(
-            f"[Startup validation error] {model_name} model output classes mismatch. "
-            f"model.output_shape[-1]={actual_class_count}. "
-            f"Label-map definitions checked: {', '.join(name for name, _ in label_map_specs)}. "
-            f"Details: {mismatch_details}."
-        )
 
 
 validate_model_label_map_sizes_or_fail(
     arabic_model,
-    "Arabic",
+    "Arabic Sign Language (ArSL_model.h5)",
     [
-        ("arabic_label_map_alphabets", arabic_label_map_alphabets),
-        ("arabic_label_map_words", arabic_label_map_words),
+        ("Arabic / Alphabets", arabic_label_map_alphabets),
+        ("Arabic / Words", arabic_label_map_words),
     ],
 )
 validate_model_label_map_sizes_or_fail(
     english_model,
-    "English",
+    "American Sign Language (ASL_model.h5)",
     [
-        ("english_label_map_alphabets", english_label_map_alphabets),
-        ("english_label_map_words", english_label_map_words),
+        ("English / Alphabets", english_label_map_alphabets),
+        ("English / Words", english_label_map_words),
     ],
 )
 
