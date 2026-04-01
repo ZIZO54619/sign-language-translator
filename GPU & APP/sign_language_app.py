@@ -3,10 +3,28 @@ import numpy as np
 import mediapipe as mp
 from tensorflow.keras.models import load_model
 import gradio as gr
+from pathlib import Path
+
+# Resolve repository model paths robustly (independent of current working directory)
+APP_DIR = Path(__file__).resolve().parent
+REPO_ROOT = APP_DIR.parent
+MODELS_DIR = REPO_ROOT / "Models"
+
+
+def load_required_model(model_filename, model_label):
+    model_path = MODELS_DIR / model_filename
+    if not model_path.exists():
+        raise FileNotFoundError(
+            f"Missing required model file for {model_label}: '{model_path}'. "
+            f"Expected model artifacts in '{MODELS_DIR}'. "
+            "Ensure Models/ArSL_model.h5 and Models/ASL_model.h5 exist."
+        )
+    return load_model(model_path)
+
 
 # Load pre-trained models
-arabic_model = load_model('arabic_sign_language_model.h5')
-english_model = load_model('english_sl_model_v2.h5')
+arabic_model = load_required_model('ArSL_model.h5', 'Arabic Sign Language')
+english_model = load_required_model('ASL_model.h5', 'American Sign Language')
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
@@ -180,5 +198,4 @@ with gr.Blocks() as demo:
     space_button.click(lambda msg: msg + " ", sentence_display, sentence_display)
 
 demo.launch(share=True)
-
 
