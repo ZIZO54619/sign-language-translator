@@ -163,6 +163,8 @@ The full training pipeline is implemented in the notebooks under `code/`.
 
 You can customize hyperparameters (learning rate, batch size, number of layers, etc.) directly in the notebooks.
 
+> **Notebook path note:** The current notebooks still contain Kaggle-specific paths (for example, `/kaggle/...`). If you run training locally, update each notebook's `data_dir` and output/save paths to match your machine. The canonical model artifacts consumed by the apps in this repository remain `Models/ArSL_model.h5` and `Models/ASL_model.h5`.
+
 ---
 
 ## Running the Applications
