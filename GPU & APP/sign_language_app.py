@@ -218,6 +218,14 @@ def delete_last(msg):
 
 with gr.Blocks() as demo:
     gr.Markdown("# SilentTalker")
+    gr.Markdown(
+        """
+### Webcam setup help
+- **Camera access is required:** allow your browser's camera permission so live predictions can run.
+- **No camera input = no predictions:** if webcam access is blocked, unsupported, or unavailable, predictions will stay as `None`.
+- **How to retry:** reopen the browser permission prompt, select a working camera device, then refresh the page if needed.
+"""
+    )
 
     with gr.Row():
         language_model = gr.Dropdown(["Arabic", "English"], label="Language Model", value="Arabic")
