@@ -7,10 +7,28 @@ from PIL import Image, ImageTk
 import threading
 import queue
 from tkinter import ttk
+from pathlib import Path
+
+# Resolve repository model paths robustly (independent of current working directory)
+APP_DIR = Path(__file__).resolve().parent
+REPO_ROOT = APP_DIR.parent
+MODELS_DIR = REPO_ROOT / "Models"
+
+
+def load_required_model(model_filename, model_label):
+    model_path = MODELS_DIR / model_filename
+    if not model_path.exists():
+        raise FileNotFoundError(
+            f"Missing required model file for {model_label}: '{model_path}'. "
+            f"Expected model artifacts in '{MODELS_DIR}'. "
+            "Ensure Models/ArSL_model.h5 and Models/ASL_model.h5 exist."
+        )
+    return load_model(model_path)
+
 
 # Load pre-trained models
-arabic_model = load_model('arabic_sign_language_model.h5')  # Ensure correct path
-english_model = load_model('english_sl_model_v2.h5')  # Ensure correct path
+arabic_model = load_required_model('ArSL_model.h5', 'Arabic Sign Language')
+english_model = load_required_model('ASL_model.h5', 'American Sign Language')
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands

@@ -115,9 +115,6 @@ python -m venv .venv
 
 # Install core dependencies
 pip install -r requirements.txt
-
-# Additional dependencies for the apps (if not already included)
-pip install pillow gradio mediapipe tensorflow
 ```
 
 Drop the trained models in the `Models/` directory with the expected names:
@@ -128,7 +125,8 @@ Models/
 └─ ASL_model.h5
 ```
 
-If you use different file names, update the paths in `GPU & APP/GUI.py` and `GPU & APP/sign_language_app.py`.
+The applications load these exact filenames from the repository `Models/` directory.
+If either model is missing, the app exits immediately with an explicit startup error.
 
 ---
 
@@ -172,6 +170,10 @@ You can customize hyperparameters (learning rate, batch size, number of layers, 
 ### 1. Desktop GUI (Tkinter)
 
 ```bash
+# From repository root
+python "GPU & APP/GUI.py"
+
+# Or from inside the app folder
 cd "GPU & APP"
 python GUI.py
 ```
@@ -185,6 +187,10 @@ Features:
 ### 2. Web App (Gradio)
 
 ```bash
+# From repository root
+python "GPU & APP/sign_language_app.py"
+
+# Or from inside the app folder
 cd "GPU & APP"
 python sign_language_app.py
 ```
