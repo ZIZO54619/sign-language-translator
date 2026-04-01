@@ -4,6 +4,8 @@ import mediapipe as mp
 from tensorflow.keras.models import load_model
 import gradio as gr
 from pathlib import Path
+import argparse
+import os
 
 # Resolve repository model paths robustly (independent of current working directory)
 APP_DIR = Path(__file__).resolve().parent
@@ -98,6 +100,54 @@ arabic_label_map_alphabets = {i: label for i, label in enumerate(arabic_labels_a
 arabic_label_map_words = {i: label for i, label in enumerate(arabic_labels_words)}
 english_label_map_alphabets = {i: label for i, label in enumerate(english_labels_alphabets)}
 english_label_map_words = {i: label for i, label in enumerate(english_labels_words)}
+
+
+def _get_model_output_class_count(model):
+    output_shape = model.output_shape
+    if isinstance(output_shape, list):
+        output_shape = output_shape[0]
+    if not output_shape or output_shape[-1] is None:
+        raise ValueError(f"Unexpected model.output_shape value: {output_shape}")
+    return int(output_shape[-1])
+
+
+def validate_model_label_map_sizes_or_fail(model, model_name, label_map_specs):
+    actual_class_count = _get_model_output_class_count(model)
+    mismatches = []
+
+    for label_map_name, label_map in label_map_specs:
+        expected_class_count = len(label_map)
+        if actual_class_count != expected_class_count:
+            mismatches.append(
+                f"{label_map_name}: expected {expected_class_count}, actual {actual_class_count}"
+            )
+
+    if mismatches:
+        mismatch_details = "; ".join(mismatches)
+        raise ValueError(
+            f"[Startup validation error] {model_name} model output classes mismatch. "
+            f"model.output_shape[-1]={actual_class_count}. "
+            f"Label-map definitions checked: {', '.join(name for name, _ in label_map_specs)}. "
+            f"Details: {mismatch_details}."
+        )
+
+
+validate_model_label_map_sizes_or_fail(
+    arabic_model,
+    "Arabic",
+    [
+        ("arabic_label_map_alphabets", arabic_label_map_alphabets),
+        ("arabic_label_map_words", arabic_label_map_words),
+    ],
+)
+validate_model_label_map_sizes_or_fail(
+    english_model,
+    "English",
+    [
+        ("english_label_map_alphabets", english_label_map_alphabets),
+        ("english_label_map_words", english_label_map_words),
+    ],
+)
 
 
 # Processing function for Gradio
@@ -205,4 +255,23 @@ with gr.Blocks() as demo:
     delete_button.click(delete_last, sentence_display, sentence_display)
     space_button.click(lambda msg: msg + " ", sentence_display, sentence_display)
 
+
+def parse_launch_args():
+    parser = argparse.ArgumentParser(description="Run the SilentTalker Gradio web app.")
+    parser.add_argument(
+        "--share",
+        action="store_true",
+        help="Enable Gradio public sharing (opt-in).",
+    )
+    return parser.parse_args()
+
+
+def env_share_enabled():
+    return os.getenv("GRADIO_SHARE", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+if __name__ == "__main__":
+    args = parse_launch_args()
+    share_enabled = args.share or env_share_enabled()
+    demo.launch(share=share_enabled)
 demo.launch(share=True)

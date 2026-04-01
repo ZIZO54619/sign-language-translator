@@ -186,6 +186,8 @@ Features:
 
 ### 2. Web App (Gradio)
 
+#### Local-only launch (default)
+
 ```bash
 # From repository root
 python "GPU & APP/sign_language_app.py"
@@ -195,7 +197,19 @@ cd "GPU & APP"
 python sign_language_app.py
 ```
 
-This starts a local Gradio server and prints a URL in the terminal. Open the URL in your browser to interact with the web interface.
+This starts a local Gradio server (`share=False`) and prints a localhost URL in the terminal. Open the URL in your browser to interact with the web interface.
+
+#### Optional public sharing (opt-in)
+
+```bash
+# Option 1: CLI flag
+python "GPU & APP/sign_language_app.py" --share
+
+# Option 2: Environment variable
+GRADIO_SHARE=true python "GPU & APP/sign_language_app.py"
+```
+
+Use sharing only when you explicitly want Gradio to create a temporary public link.
 
 ---
 
