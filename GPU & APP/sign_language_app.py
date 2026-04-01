@@ -4,6 +4,8 @@ import mediapipe as mp
 from tensorflow.keras.models import load_model
 import gradio as gr
 from pathlib import Path
+import argparse
+import os
 
 # Resolve repository model paths robustly (independent of current working directory)
 APP_DIR = Path(__file__).resolve().parent
@@ -197,5 +199,22 @@ with gr.Blocks() as demo:
     delete_button.click(delete_last, sentence_display, sentence_display)
     space_button.click(lambda msg: msg + " ", sentence_display, sentence_display)
 
-demo.launch(share=True)
 
+def parse_launch_args():
+    parser = argparse.ArgumentParser(description="Run the SilentTalker Gradio web app.")
+    parser.add_argument(
+        "--share",
+        action="store_true",
+        help="Enable Gradio public sharing (opt-in).",
+    )
+    return parser.parse_args()
+
+
+def env_share_enabled():
+    return os.getenv("GRADIO_SHARE", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+if __name__ == "__main__":
+    args = parse_launch_args()
+    share_enabled = args.share or env_share_enabled()
+    demo.launch(share=share_enabled)
