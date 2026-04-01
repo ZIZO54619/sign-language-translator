@@ -267,4 +267,3 @@ if __name__ == "__main__":
     args = parse_launch_args()
     share_enabled = args.share or env_share_enabled()
     demo.launch(share=share_enabled)
-demo.launch(share=True)

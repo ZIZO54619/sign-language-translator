@@ -212,6 +212,7 @@ GRADIO_SHARE=true python "GPU & APP/sign_language_app.py"
 ```
 
 Use sharing only when you explicitly want Gradio to create a temporary public link.
+**Clear rule:** sharing stays disabled by default (`share=False`) and is enabled only if you pass `--share` or set `GRADIO_SHARE=true`.
 
 ---
 
